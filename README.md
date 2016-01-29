@@ -4,6 +4,7 @@ getFinancing-opencart
 Installing the module
 ---------------------
 - unzip the .zip file
+- use 1.5.x or 2.0.x-2.1.x depending on your opencart version
 - copy over the app and lib trees
 
 
