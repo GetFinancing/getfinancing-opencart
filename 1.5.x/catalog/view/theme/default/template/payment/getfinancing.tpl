@@ -1,4 +1,4 @@
-<script type="text/javascript" src="https://partner.getfinancing.com/libs/1.0/getfinancing.js">
+<script type="text/javascript" src="https://cdn.getfinancing.com/libs/1.0/getfinancing.js">
 </script>
 <script type="text/javascript">
 
