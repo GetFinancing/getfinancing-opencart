@@ -63,7 +63,7 @@ class ControllerPaymentGetfinancing extends Controller
           $shipping = $this->session->data['shipping_method'];
 
           if (!empty($shipping)) {
-              $shipping_amount = number_format($shipping['cost'],2,'','.');
+              $shipping_amount = $shipping['cost'];
           }
         }
 
@@ -78,8 +78,17 @@ class ControllerPaymentGetfinancing extends Controller
                 //product description
                 $products = $this->cart->getProducts();
                 $description="";
+        
+        $cart_items = array();
         foreach ($products as $key => $item) {
             $description[]=$item['name'] . " ( ".$item['quantity'].") ";
+            $cart_items[] = array(
+                            'sku' => $item['name'],
+                            'display_name' => $item['name'],
+                            'unit_price' => $item['price'],
+                            'quantity' => $item['quantity'],
+                            'unit_tax' => $tax_price
+                         );
         }
         $data['description']=implode(",",$description);
 
@@ -89,12 +98,16 @@ class ControllerPaymentGetfinancing extends Controller
         if (empty($order_info['shipping_city'])){$order_info['shipping_city']= $order_info['payment_city'];}
         if (empty($order_info['shipping_zone'])){$order_info['shipping_zone']= $order_info['payment_zone'];}
         if (empty($order_info['shipping_postcode'])){$order_info['shipping_postcode']= $order_info['payment_postcode'];}
+        
+        $totalPrice = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
 
         $getfinancing_data = array(
-            'amount'           =>  $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false),
-            'product_info'     =>  $data['description'],
+            'amount'           =>  $totalPrice,
+//            'product_info'     =>  $data['description'],
+            'cart_items'       => $cart_items,
             'first_name'       => $order_info['payment_firstname'],
             'last_name'        => $order_info['payment_lastname'],
+            'phone'            => $order_info['telephone'],
             'shipping_address' => array(
                 'street1'  => $order_info['payment_address_1'].' '.$order_info['payment_address_2'],
                 'city'    => $order_info['payment_city'],
@@ -110,6 +123,7 @@ class ControllerPaymentGetfinancing extends Controller
             'email'            => $order_info['email'],
             'merchant_loan_id' => (string)$this->session->data['order_id'],
             'shipping_amount'  => $shipping_amount,
+            'software_name'    => 'Opencart',
             'version' => '1.9'
         );
 
@@ -166,6 +180,7 @@ class ControllerPaymentGetfinancing extends Controller
         $error = curl_error($ch);
         curl_close($ch);
         $res = json_decode($result,true);
+
         if( !empty($res['type'])){
           //TODO: show error
           $this->document->setTitle($this->language->get('heading_fail'));
